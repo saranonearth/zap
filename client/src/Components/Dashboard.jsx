@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import getWeb3 from "../getWeb3";
 import Zap from "../contracts/Zap.json";
+
 const Dashboard = () => {
   const history = useHistory();
   const [state, setstate] = useState({
