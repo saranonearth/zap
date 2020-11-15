@@ -9,15 +9,13 @@ const Home = () => {
   const history = useHistory();
 
   useEffect(() => {
-    window.addEventListener("load", () => {
-      const currentAddress = window.ethereum.selectedAddress;
-      if (currentAddress) {
-        setConnected(true);
-        history.push("/dashboard");
-      } else {
-        setConnected(false);
-      }
-    });
+    const currentAddress = window.ethereum.selectedAddress;
+    if (currentAddress) {
+      setConnected(true);
+      history.push("/dashboard");
+    } else {
+      setConnected(false);
+    }
   });
 
   const authHandler = async () => {
@@ -25,6 +23,7 @@ const Home = () => {
       web3 = await getWeb3();
       //CHANGE STATE OF WEB3 OBJECT
       setWeb3(web3);
+
       history.push("/dashboard");
     } catch (error) {
       alert(
