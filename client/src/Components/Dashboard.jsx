@@ -7,6 +7,8 @@ import { createBuffer } from "../utilities";
 import styled from "styled-components";
 import Blockies from "react-blockies";
 import Footer from "./Footer";
+import { Bar } from "./Styles";
+import Popover from "react-awesome-popover";
 const Wrapper = styled.div`
   text-align: center;
 `;
@@ -21,12 +23,6 @@ const Container = styled.div`
   margin: auto;
 `;
 
-const Bar = styled.div`
-  background-color: #f2e3ff;
-  width: 100%;
-  height: 60px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
-`;
 const Heading = styled.h1`
   font-size: 2em;
   font-weight: 600;
@@ -91,6 +87,10 @@ const Flex = styled.div`
 `;
 const White = styled.p`
   color: white;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const Holder = styled.div`
@@ -146,11 +146,11 @@ const File = styled.div`
   height: 300px;
   border-radius: 8px;
   border: 1px solid #b487d9;
-  height: ;
 `;
 
 const Dashboard = () => {
   const history = useHistory();
+
   const [state, setstate] = useState({
     accounts: null,
     web3: null,
@@ -161,50 +161,38 @@ const Dashboard = () => {
     ipfsError: null,
   });
 
-  // useEffect(() => {
-  //   if (state.contract != null) {
-  //     getData();
-  //   }
-  // }, [state.contract]);
-
   useEffect(() => {
-    let unmounted = false;
     const address = window.ethereum.selectedAddress;
-
-    if (address == null) {
+    console.log(address);
+    if (address === null) {
       history.push("/");
     }
-
-    const setup = async () => {
-      try {
-        const web3 = await getWeb3();
-
-        const accounts = await web3.eth.getAccounts();
-        const networkId = await web3.eth.net.getId();
-        const deployedNetwork = Zap.networks[networkId];
-
-        const instance = new web3.eth.Contract(
-          Zap.abi,
-          deployedNetwork && deployedNetwork.address
-        );
-        if (!unmounted) {
-          setstate({
-            ...state,
-            contract: instance,
-            accounts,
-            web3,
-          });
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
     setup();
-    return () => {
-      unmounted = true;
-    };
   }, []);
+
+  const setup = async () => {
+    try {
+      const web3 = await getWeb3();
+
+      const accounts = await web3.eth.getAccounts();
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = Zap.networks[networkId];
+
+      const instance = new web3.eth.Contract(
+        Zap.abi,
+        deployedNetwork && deployedNetwork.address
+      );
+
+      setstate({
+        ...state,
+        contract: instance,
+        accounts,
+        web3,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const getData = async () => {
     const { accounts, contract } = state;
@@ -267,7 +255,7 @@ const Dashboard = () => {
       <button onClick={handleSubmit}>upload</button> */}
       <FileUpload>
         <div>
-          <i class="fa fa-plus" aria-hidden="true"></i>
+          <i className="fa fa-plus" aria-hidden="true"></i>
         </div>
       </FileUpload>
       <Container>
@@ -286,13 +274,19 @@ const Dashboard = () => {
                 />
               </div>
               <AlignCenter>
-                <div>
-                  <White>
-                    {window.ethereum.selectedAddress.substr(0, 6) +
-                      "..." +
-                      window.ethereum.selectedAddress.substr(37, 42)}
-                  </White>
-                </div>
+                <Popover action="hover" overlayColor="rgba(0,0,0,0)">
+                  <div>
+                    <White>
+                      {window.ethereum.selectedAddress &&
+                        window.ethereum.selectedAddress.substr(0, 6) +
+                          "..." +
+                          window.ethereum.selectedAddress.substr(37, 42)}
+                    </White>
+                  </div>
+                  <div class="sm">
+                    <White>{window.ethereum.selectedAddress}</White>
+                  </div>
+                </Popover>
               </AlignCenter>
             </Align>
           </Account>
@@ -300,17 +294,17 @@ const Dashboard = () => {
           <Holder className="flex center">
             <Align className="v-center">
               <div>
-                <p className="md display">
-                  <i class="fas fa-file md-v"></i> <p>16 files</p>
-                </p>
+                <div className="md display">
+                  <i className="fas fa-file md-v"></i> <p>16 files</p>
+                </div>
               </div>
             </Align>
             <Align className="v-center">
               <div>
-                <p className="md display">
-                  <i class="fas fa-clock md-v"></i>{" "}
+                <div className="md display">
+                  <i className="fas fa-clock md-v"></i>
                   <p>Last uploaded yesterday</p>
-                </p>
+                </div>
               </div>
             </Align>
           </Holder>
@@ -324,7 +318,7 @@ const Dashboard = () => {
           <div className="flex ">
             <div className="sort">
               <div>
-                <i class="far fa-calendar-alt"></i>
+                <i className="far fa-calendar-alt"></i>
               </div>
             </div>
             <div>
@@ -336,15 +330,15 @@ const Dashboard = () => {
         <FileList>
           <File>
             <div className="file-content">
-              <div class="part-top">
+              <div className="part-top">
                 <div>
-                  <i class="far fa-image file-icon"></i>
+                  <i className="far fa-image file-icon"></i>
                 </div>
               </div>
               <div className="part-bottom flex">
                 <div className="ml-2 w-sm">
                   <p>
-                    <i class="fas fa-download primary"></i>
+                    <i className="fas fa-download primary"></i>
                   </p>
                 </div>
                 <div className="center w-lg">

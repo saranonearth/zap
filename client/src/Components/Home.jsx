@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import getWeb3 from "../getWeb3";
+import Footer from "./Footer";
 
 const Home = () => {
   const [isConnected, setConnected] = useState(null);
@@ -36,7 +37,21 @@ const Home = () => {
   if (isConnected === null || isConnected === true) {
     return <h1>Connecting...</h1>;
   } else if (isConnected === false) {
-    return <button onClick={authHandler}>Login with metamask</button>;
+    return (
+      <div className="home">
+        <div className="bar"></div>
+        <div className="mainholder">
+          <div className="title">
+            <i className="fas fa-project-diagram"></i> Zap
+          </div>
+          <div className="sub-text">Decentralized file storage platform.</div>
+          <button className="login-btn" onClick={authHandler}>
+            Login with Metamask
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 };
 
