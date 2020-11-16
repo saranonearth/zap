@@ -1,6 +1,4 @@
 import React from "react";
-import styled from "styled-components";
-import "./ProgressBar.css";
 
 const ProgressBar = (props) => {
   const parent = props;
