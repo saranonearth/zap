@@ -9,6 +9,26 @@ import Blockies from "react-blockies";
 import Footer from "./Footer";
 import { Bar } from "./Styles";
 import Popover from "react-awesome-popover";
+import ProgressBar from "./ProgressBar";
+
+const readings = [
+  {
+    name: "Filetype A",
+    value: 60,
+    color: "#eb4d4b",
+  },
+  {
+    name: "Filetype B",
+    value: 10,
+    color: "#22a6b3",
+  },
+  {
+    name: "Filetype c",
+    value: 30,
+    color: "#6ab04c",
+  },
+];
+
 const Wrapper = styled.div`
   text-align: center;
 `;
@@ -308,7 +328,9 @@ const Dashboard = () => {
               </div>
             </Align>
           </Holder>
-          <Holder>file type distibution graph</Holder>
+          <Holder>
+            <ProgressBar readings={readings} />
+          </Holder>
         </TopBar>
         <SearchHolder>
           <div>
