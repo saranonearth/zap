@@ -6,9 +6,12 @@
         "blockies": "0.0.2",
         "ipfs-http-client": "^48.1.0",
         "react": "16.11.0",
+        "react-awesome-popover": "^6.1.1",
+        "react-blockies": "^1.4.1",
         "react-dom": "16.11.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.2.0",
+        "styled-components": "^5.2.1",
         "web3": "1.2.2"
     },
     "scripts": {
