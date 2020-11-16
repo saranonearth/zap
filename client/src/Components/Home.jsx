@@ -9,13 +9,15 @@ const Home = () => {
   const history = useHistory();
 
   useEffect(() => {
-    const currentAddress = window.ethereum.selectedAddress;
-    if (currentAddress) {
-      setConnected(true);
-      history.push("/dashboard");
-    } else {
-      setConnected(false);
-    }
+    window.addEventListener("load", () => {
+      const currentAddress = window.ethereum.selectedAddress;
+      if (currentAddress) {
+        setConnected(true);
+        history.push("/dashboard");
+      } else {
+        setConnected(false);
+      }
+    });
   });
 
   const authHandler = async () => {

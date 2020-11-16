@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import getWeb3 from "../getWeb3";
 import Zap from "../contracts/Zap.json";
+import { ipfs, urlSource, globSource } from "../ipfs.util";
 
 const Dashboard = () => {
   const history = useHistory();
@@ -9,6 +10,7 @@ const Dashboard = () => {
     accounts: null,
     web3: null,
     contract: null,
+    buffer: null,
   });
 
   const setup = async () => {
@@ -44,17 +46,49 @@ const Dashboard = () => {
     setup();
   }, []);
 
-  console.table(state);
-
+  //Function to fetch all files of the logged in user.
   const getData = async () => {
     const { accounts, contract } = state;
 
     const response = await contract.methods.name().call();
-
     console.log(response);
-    console.log("Hey from getData");
+    // console.log("Hey from getData");
   };
+  const submit = async () => {
+    console.log("UPLOADING TO IPFS", state.buffer);
 
+    try {
+      console.log("fdgdfg");
+      const res = await ipfs.add(state.buffer);
+      console.log(res);
+      console.log("HERE");
+    } catch (error) {
+      console.log("ERROR IPFS", error);
+    }
+  };
+  const uploadFile = (e) => {
+    let buffer;
+    let type;
+    let name;
+    const file = e.target.files[0];
+    const reader = new window.FileReader();
+
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => {
+      buffer = Buffer(reader.result);
+      type = file.type;
+      name = file.name;
+
+      console.log("buffer", buffer);
+      console.log("type", type);
+      console.log("name", name);
+
+      setstate({
+        ...state,
+        buffer,
+      });
+    };
+  };
   useEffect(() => {
     if (state.contract != null) {
       getData();
@@ -66,6 +100,12 @@ const Dashboard = () => {
       <h1>Dashboard here</h1>
       <p>{window.ethereum.selectedAddress}</p>
       <p>value:</p>
+      <input
+        type="file"
+        onChange={uploadFile}
+        className="text-white text-monospace"
+      />
+      <button onClick={submit}>upload</button>
     </>
   );
 };
