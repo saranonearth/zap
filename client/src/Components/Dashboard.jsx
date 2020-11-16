@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import getWeb3 from "../getWeb3";
 import Zap from "../contracts/Zap.json";
@@ -13,19 +13,19 @@ import ProgressBar from "./ProgressBar";
 
 const readings = [
   {
-    name: "Filetype A",
+    name: "pdf",
     value: 60,
-    color: "#eb4d4b",
+    color: "#4818a9",
   },
   {
-    name: "Filetype B",
+    name: "jpeg",
     value: 10,
-    color: "#22a6b3",
+    color: "#5e299a",
   },
   {
-    name: "Filetype c",
+    name: "others",
     value: 30,
-    color: "#6ab04c",
+    color: "#6a4cb0",
   },
 ];
 
@@ -169,6 +169,7 @@ const File = styled.div`
 `;
 
 const Dashboard = () => {
+  const hiddenFileInput = useRef();
   const history = useHistory();
 
   const [state, setstate] = useState({
@@ -179,6 +180,7 @@ const Dashboard = () => {
     type: null,
     name: null,
     ipfsError: null,
+    loading: false,
   });
 
   useEffect(() => {
@@ -222,20 +224,48 @@ const Dashboard = () => {
   };
 
   const handleSubmit = async () => {
+    console.log("IPFS UPLOAD");
+    console.log(state.buffer);
+    setstate({
+      ...state,
+      loading: true,
+    });
+
     try {
       const res = await ipfs.add(state.buffer);
       console.log(res);
+
+      setstate({
+        ...state,
+        buffer: null,
+        name: null,
+        type: null,
+        loading: false,
+      });
     } catch (error) {
       setstate({
         ...state,
         ipfsError: "Upload Error",
+        loading: false,
       });
       console.log("ERROR IPFS", error);
     }
   };
 
   const handleOnChange = (e) => {
-    const { buffer, type, name } = createBuffer(e);
+    e.stopPropagation();
+    e.preventDefault();
+
+    const file = e.target.files[0];
+    let reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => convertToBuffer(reader, file.type, file.name);
+  };
+  const convertToBuffer = async (reader, type, name) => {
+    const buffer = await Buffer.from(reader.result);
+
+    console.log(buffer, type, name);
+
     setstate({
       ...state,
       buffer,
@@ -271,12 +301,27 @@ const Dashboard = () => {
       </Bar>
       <Wrapper></Wrapper>
 
-      {/* <input type="file" onChange={handleOnChange} />
-      <button onClick={handleSubmit}>upload</button> */}
+      <input
+        style={{ display: "none" }}
+        ref={hiddenFileInput}
+        type="file"
+        onChange={handleOnChange}
+      />
+
       <FileUpload>
-        <div>
-          <i className="fa fa-plus" aria-hidden="true"></i>
-        </div>
+        {state.loading ? (
+          <div>
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+        ) : !state.buffer ? (
+          <div onClick={() => hiddenFileInput.current.click()}>
+            <i className="fa fa-plus" aria-hidden="true"></i>
+          </div>
+        ) : (
+          <div onClick={() => handleSubmit()}>
+            <i className="fa fa-upload" aria-hidden="true"></i>
+          </div>
+        )}
       </FileUpload>
       <Container>
         <TopBar>
@@ -303,7 +348,7 @@ const Dashboard = () => {
                           window.ethereum.selectedAddress.substr(37, 42)}
                     </White>
                   </div>
-                  <div class="sm">
+                  <div className="sm">
                     <White>{window.ethereum.selectedAddress}</White>
                   </div>
                 </Popover>
