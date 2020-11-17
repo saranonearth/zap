@@ -194,17 +194,17 @@ const Dashboard = () => {
     if (searchState.searchActive) {
       return searchState.searchFiles.length > 0 ? (
         searchState.searchFiles.map((e, index) => {
-          const fileType = e[3];
+          const fileName = e[4];
           let fileIcon;
-          if (fileType === "application/pdf") {
+          if (fileName.includes("pdf")) {
             fileIcon = "far fa-file-pdf fa-5x primary";
-          } else if (fileType === "image/png") {
+          } else if (fileName.includes("png")) {
             fileIcon = "far fa-image fa-5x file-icon primary";
-          } else if (fileType === "image/jpeg") {
+          } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
             fileIcon = "fas fa-image fa-5x file-icon primary";
-          } else if (fileType === "application/vnd.ms-powerpoint") {
+          } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
             fileIcon = "far fa-file-powerpoint fa-5x primary";
-          } else if (fileType === "application/msword") {
+          } else if (fileName.includes("doc" || fileName.includes("docx"))) {
             fileIcon = "far fa-file-word fa-5x primary";
           }
           return (
@@ -236,17 +236,17 @@ const Dashboard = () => {
       return fileData.files.length > 0 ? (
         fileData.files
           .map((e, index) => {
-            const fileType = e[3];
+            const fileName = e[4];
             let fileIcon;
-            if (fileType === "application/pdf") {
+            if (fileName.includes("pdf")) {
               fileIcon = "far fa-file-pdf fa-5x primary";
-            } else if (fileType === "image/png") {
+            } else if (fileName.includes("png")) {
               fileIcon = "far fa-image fa-5x file-icon primary";
-            } else if (fileType === "image/jpeg") {
+            } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
               fileIcon = "fas fa-image fa-5x file-icon primary";
-            } else if (fileType === "application/vnd.ms-powerpoint") {
+            } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
               fileIcon = "far fa-file-powerpoint fa-5x primary";
-            } else if (fileType === "application/msword") {
+            } else if (fileName.includes("doc" || fileName.includes("docx"))) {
               fileIcon = "far fa-file-word fa-5x primary";
             }
             return (
