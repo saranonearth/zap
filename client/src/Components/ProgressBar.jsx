@@ -1,11 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const ProgressBar = (props) => {
-  const parent = props;
+  const { fileData } = props;
+  const totalFiles = fileData.files.length;
+  let fileTypeCount = { doc: 0, jpg: 0, pdf: 0, png: 0, ppt: 0 };
+  const [readings, setReadings] = useState([
+    {
+      name: "doc",
+      value: 0,
+      color: "#4818a9",
+    },
+    {
+      name: "jpg",
+      value: 0,
+      color: "#5e299a",
+    },
+    {
+      name: "pdf",
+      value: 0,
+      color: "#6a4cb0",
+    },
+    {
+      name: "png",
+      value: 0,
+      color: "#2264D1",
+    },
+    {
+      name: "ppt",
+      value: 0,
+      color: "#133774",
+    },
+  ]);
+  useEffect(() => {
+    fileData.files.forEach((e, index) => {
+      const fileType = e[3];
+      if (fileType === "application/pdf") {
+        fileTypeCount["pdf"] += 1;
+      } else if (fileType === "image/png") {
+        fileTypeCount["png"] += 1;
+      } else if (fileType === "image/jpeg") {
+        fileTypeCount["jpg"] += 1;
+      } else if (fileType === "application/vnd.ms-powerpoint") {
+        fileTypeCount["ppt"] += 1;
+      } else if (fileType === "application/msword") {
+        fileTypeCount["doc"] += 1;
+      }
+    });
+    let newReadings = [...readings];
+    newReadings.forEach((e, index) => {
+      const fileType = e.name;
+      const numberOfFiles = fileTypeCount[fileType];
+      e.value = parseInt((numberOfFiles / totalFiles) * 100);
+    });
+    setReadings(newReadings);
+  });
+
   let values =
-    parent.readings &&
-    parent.readings.length &&
-    parent.readings.map(function (item, i) {
+    readings &&
+    readings.length &&
+    readings.map(function (item, i) {
       if (item.value > 0) {
         return (
           <div
@@ -21,9 +74,9 @@ const ProgressBar = (props) => {
     });
 
   let calibrations =
-    parent.readings &&
-    parent.readings.length &&
-    parent.readings.map(function (item, i) {
+    readings &&
+    readings.length &&
+    readings.map(function (item, i) {
       if (item.value > 0) {
         return (
           <div
@@ -38,9 +91,9 @@ const ProgressBar = (props) => {
     });
 
   let bars =
-    parent.readings &&
-    parent.readings.length &&
-    parent.readings.map(function (item, i) {
+    readings &&
+    readings.length &&
+    readings.map(function (item, i) {
       if (item.value > 0) {
         return (
           <div
@@ -53,9 +106,9 @@ const ProgressBar = (props) => {
     });
 
   let legends =
-    parent.readings &&
-    parent.readings.length &&
-    parent.readings.map(function (item, i) {
+    readings &&
+    readings.length &&
+    readings.map(function (item, i) {
       if (item.value > 0) {
         return (
           <div className="legend" key={i}>
