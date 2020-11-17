@@ -5,246 +5,248 @@ p3:#6200B4
 */
 
 .identicon {
-  border-radius: 50%;
-  border: white 1.5px solid;
-  padding: 2px;
+    border-radius: 50%;
+    border: white 1.5px solid;
+    padding: 2px;
 }
 
 .md {
-  font-size: 1.1em;
-  color: #333;
+    font-size: 1.1em;
+    color: #333;
 }
 
 .md-v {
-  color: #521aab;
-  font-size: 2em;
+    color: #521aab;
+    font-size: 2em;
 }
 
 .v-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .display {
-  color: #521aab;
-  font-weight: 600;
+    color: #521aab;
+    font-weight: 600;
 }
 
 .center {
-  text-align: center;
+    text-align: center;
 }
 
 .sort {
-  background: linear-gradient(
-    90deg,
-    rgba(77, 1, 180, 1) 0%,
-    rgba(101, 1, 180, 1) 100%
-  );
-  color: white;
-  padding: 25px;
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 10px;
-  transition: 0.5s;
+    background: linear-gradient( 90deg, rgba(77, 1, 180, 1) 0%, rgba(101, 1, 180, 1) 100%);
+    color: white;
+    padding: 25px;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    transition: 0.5s;
 }
 
 .file-content {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .part-top {
-  height: 90%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .primary:hover {
-  cursor: pointer;
-  color: #521aab;
+    cursor: pointer;
+    color: #521aab;
 }
 
 .primary {
-  color: #8055c6;
-  transition: 0.5s;
+    color: #8055c6;
+    transition: 0.5s;
 }
 
 .part-bottom {
-  height: 5%;
-  margin: 20px;
-  width: 100%;
+    height: 5%;
+    margin: 20px;
+    width: 100%;
 }
 
 .w-sm {
-  width: 10%;
+    width: 10%;
 }
 
 .w-lg {
-  width: 60%;
-  font-weight: 600;
-  color: #521aab;
+    width: 60%;
+    font-weight: 600;
+    color: #521aab;
 }
 
 center {
-  text-align: center;
+    text-align: center;
 }
 
 .file-icon {
-  font-size: 7em;
-  color: #8055c6;
+    font-size: 7em;
+    color: #8055c6;
 }
 
 .sort:hover {
-  opacity: 0.8;
-  cursor: pointer;
+    opacity: 0.8;
+    cursor: pointer;
 }
 
 .ml-2 {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 .search {
-  border: none;
-  padding: 10px;
-  height: 50px;
-  width: 400px;
-  border-radius: 10px;
-  border: rgba(77, 1, 180, 1) solid 2px;
-  color: rgb(125, 125, 125);
+    border: none;
+    padding: 10px;
+    height: 50px;
+    width: 400px;
+    border-radius: 10px;
+    border: rgba(77, 1, 180, 1) solid 2px;
+    color: rgb(125, 125, 125);
 }
 
 .bar {
-  width: 100%;
-  height: 20px;
-  background-color: #521aab;
+    width: 100%;
+    height: 20px;
+    background-color: #521aab;
 }
 
 .mainholder {
-  width: 80%;
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  flex-direction: column;
+    width: 80%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    flex-direction: column;
 }
 
 .home {
-  width: 100%;
-  height: 100vh;
-  background-color: #521aab;
+    width: 100%;
+    height: 100vh;
+    background-color: #521aab;
 }
 
 .title {
-  font-size: 9em;
-  font-weight: 700;
-  color: #fff;
+    font-size: 9em;
+    font-weight: 700;
+    color: #fff;
 }
 
 .sm {
-  font-size: 0.5em;
-  background-color: #000;
-  padding: 10px;
+    font-size: 0.5em;
+    background-color: #000;
+    padding: 10px;
 }
 
 .sub-text {
-  font-size: 2em;
-  /* color: #521aab; */
-  color: white;
-  font-weight: 200;
+    font-size: 2em;
+    /* color: #521aab; */
+    color: white;
+    font-weight: 200;
 }
 
 .login-btn {
-  margin-top: 30px;
-  border: none;
-  padding: 20px;
-  background-color: white;
-  color: #521aab;
-  border-radius: 10px;
-  font-weight: 500;
-  transition: 0.5s;
+    margin-top: 30px;
+    border: none;
+    padding: 20px;
+    background-color: white;
+    color: #521aab;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 0.5s;
 }
 
 .login-btn:hover {
-  cursor: pointer;
-  background-color: #521aab;
-  color: white;
-  border: 1px solid white;
+    cursor: pointer;
+    background-color: #521aab;
+    color: white;
+    border: 1px solid white;
 }
 
 .footer {
-  background-color: #521aab;
-  color: white;
-  position: fixed;
-  bottom: 0;
-  height: 40px;
-  margin-top: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+    background-color: #521aab;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    height: 40px;
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.hover:hover {
+    opacity: 0.8;
+    cursor: pointer;
 }
 
 .flex {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
+
 
 /* Progress style */
 
 .multicolor-bar {
-  margin: 20px 20%;
+    margin: 20px 20%;
 }
 
 .multicolor-bar .values .value {
-  float: left;
-  text-align: center;
+    float: left;
+    text-align: center;
 }
 
 .multicolor-bar .scale .graduation {
-  float: left;
-  text-align: center;
+    float: left;
+    text-align: center;
 }
 
 .multicolor-bar .bars .bar {
-  float: left;
-  height: 10px;
+    float: left;
+    height: 10px;
 }
 
 .multicolor-bar .bars div.bar:first-of-type {
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
 }
 
 .multicolor-bar .bars div.bar:last-of-type {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .multicolor-bar .legends {
-  text-align: center;
+    text-align: center;
 }
 
 .multicolor-bar .legends .legend {
-  display: inline-block;
-  margin: 0 5px;
-  text-align: center;
+    display: inline-block;
+    margin: 0 5px;
+    text-align: center;
 }
 
 .multicolor-bar .legends .legend .dot {
-  font-size: 25px;
-  vertical-align: middle;
+    font-size: 25px;
+    vertical-align: middle;
 }
 
 .multicolor-bar .legends .legend .label {
-  margin-left: 2px;
-  vertical-align: middle;
+    margin-left: 2px;
+    vertical-align: middle;
 }
