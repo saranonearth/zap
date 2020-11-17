@@ -5,11 +5,12 @@ import Footer from "./Footer";
 
 const Home = () => {
   const [isConnected, setConnected] = useState(null);
-  let [web3, setWeb3] = useState(null);
+  const [isMobile, setMobile] = useState(false);
 
   const history = useHistory();
 
   useEffect(() => {
+    setMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
     const currentAddress = window.ethereum.selectedAddress;
     if (currentAddress) {
       setConnected(true);
@@ -21,9 +22,7 @@ const Home = () => {
 
   const authHandler = async () => {
     try {
-      web3 = await getWeb3();
-      //CHANGE STATE OF WEB3 OBJECT
-      setWeb3(web3);
+      const web3 = await getWeb3();
 
       history.push("/dashboard");
     } catch (error) {
@@ -34,24 +33,47 @@ const Home = () => {
     }
   };
 
-  if (isConnected === null || isConnected === true) {
-    return <h1>Connecting...</h1>;
-  } else if (isConnected === false) {
-    return (
-      <div className="home">
-        <div className="bar"></div>
-        <div className="mainholder">
-          <div className="title">
-            <i className="fas fa-project-diagram"></i> Zap
+  if (isMobile) {
+    if (isConnected === null || isConnected === true) {
+      return <h1>Connecting...</h1>;
+    } else if (isConnected === false) {
+      return (
+        <div className="home">
+          <div className="bar"></div>
+          <div className="mainholder">
+            <div className="title">
+              <i className="fas fa-project-diagram"></i> Zap
+            </div>
+            <div className="sub-text">Decentralized file storage platform.</div>
+            <br />
+            <div className="sub-text">
+              App not compatible with your device. Please open on Desktop
+            </div>
           </div>
-          <div className="sub-text">Decentralized file storage platform.</div>
-          <button className="login-btn" onClick={authHandler}>
-            Login with Metamask
-          </button>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-    );
+      );
+    }
+  } else {
+    if (isConnected === null || isConnected === true) {
+      return <h1>Connecting...</h1>;
+    } else if (isConnected === false) {
+      return (
+        <div className="home">
+          <div className="bar"></div>
+          <div className="mainholder">
+            <div className="title">
+              <i className="fas fa-project-diagram"></i> Zap
+            </div>
+            <div className="sub-text">Decentralized file storage platform.</div>
+            <button className="login-btn" onClick={authHandler}>
+              Login with Metamask
+            </button>
+          </div>
+          <Footer />
+        </div>
+      );
+    }
   }
 };
 
