@@ -33,16 +33,16 @@ const ProgressBar = (props) => {
   ]);
   useEffect(() => {
     fileData.files.forEach((e, index) => {
-      const fileType = e[3];
-      if (fileType === "application/pdf") {
+      const fileName = e[4];
+      if (fileName.includes("pdf")) {
         fileTypeCount["pdf"] += 1;
-      } else if (fileType === "image/png") {
+      } else if (fileName.includes("png")) {
         fileTypeCount["png"] += 1;
-      } else if (fileType === "image/jpeg") {
+      } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
         fileTypeCount["jpg"] += 1;
-      } else if (fileType === "application/vnd.ms-powerpoint") {
+      } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
         fileTypeCount["ppt"] += 1;
-      } else if (fileType === "application/msword") {
+      } else if (fileName.includes("doc") || fileName.includes("docx")) {
         fileTypeCount["doc"] += 1;
       }
     });
@@ -53,7 +53,7 @@ const ProgressBar = (props) => {
       e.value = parseInt((numberOfFiles / totalFiles) * 100);
     });
     setReadings(newReadings);
-  });
+  }, [props]);
 
   let values =
     readings &&
