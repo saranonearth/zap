@@ -199,6 +199,26 @@ center {
     flex-direction: row;
 }
 
+.cancel {
+    transition: 0.5s;
+    background: linear-gradient( 90deg, rgba(77, 1, 180, 1) 0%, rgba(101, 1, 180, 1) 100%);
+    color: white;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    right: 2.75%;
+    bottom: 13%;
+    font-size: 0.7em;
+    border-radius: 10px;
+}
+
+.cancel-icon {
+    font-size: 1.3em;
+    margin-right: 5px;
+}
+
 
 /* Progress style */
 

@@ -85,6 +85,15 @@ const Dashboard = () => {
     getData();
   }, [state.contract]);
 
+  const cancelUpload = () => {
+    console.log("cancel upload");
+    setstate({
+      ...state,
+      buffer: null,
+      name: null,
+      type: null,
+    });
+  };
   const getData = async () => {
     const { accounts, contract } = state;
     if (contract) {
@@ -246,6 +255,12 @@ const Dashboard = () => {
         type="file"
         onChange={handleOnChange}
       />
+
+      {state.buffer && state.loading === false ? (
+        <div className="cancel hover" onClick={cancelUpload}>
+          <i className="fas cancel-icon fa-window-close"></i> Cancel
+        </div>
+      ) : null}
 
       <FileUpload>
         {state.loading ? (
