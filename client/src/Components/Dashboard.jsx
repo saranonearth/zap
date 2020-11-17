@@ -8,7 +8,7 @@ import Zap from "../contracts/Zap.json";
 import { ipfs } from "../ipfs.util";
 import Footer from "./Footer";
 import ProgressBar from "./ProgressBar";
-import { readings, generateUID } from "../utilities";
+import { generateUID } from "../utilities";
 import {
   Wrapper,
   Light,
@@ -46,6 +46,11 @@ const Dashboard = () => {
 
   const [fileData, setFiles] = useState({
     files: [],
+  });
+
+  const [searchState, setSearch] = useState({
+    searchActive: false,
+    searchFiles: [],
   });
 
   useEffect(() => {
@@ -195,31 +200,107 @@ const Dashboard = () => {
   };
 
   const Files = () => {
-    return fileData.files.length > 0 ? (
-      fileData.files.map((e, index) => (
-        <File key={index}>
-          <div className="file-content">
-            <div className="part-top">
-              <div>
-                <i className="far fa-image file-icon"></i>
+    if (searchState.searchActive) {
+      return searchState.searchFiles.length > 0 ? (
+        searchState.searchFiles.map((e, index) => {
+          const fileName = e[4];
+          let fileIcon;
+          if (fileName.includes("pdf")) {
+            fileIcon = "far fa-file-pdf fa-5x primary";
+          } else if (fileName.includes("png")) {
+            fileIcon = "far fa-image fa-5x file-icon primary";
+          } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
+            fileIcon = "fas fa-image fa-5x file-icon primary";
+          } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
+            fileIcon = "far fa-file-powerpoint fa-5x primary";
+          } else if (fileName.includes("doc" || fileName.includes("docx"))) {
+            fileIcon = "far fa-file-word fa-5x primary";
+          }
+          return (
+            <File key={index}>
+              <div className="file-content">
+                <div className="part-top">
+                  <div>
+                    <i className={fileIcon}></i>
+                  </div>
+                </div>
+                <div className="part-bottom flex">
+                  <div className="ml-2 w-sm">
+                    <p>
+                      <i className="fas fa-download primary"></i>
+                    </p>
+                  </div>
+                  <div className="center w-lg">
+                    <p className="hover">{e[4]}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="part-bottom flex">
-              <div className="ml-2 w-sm">
-                <p>
-                  <i className="fas fa-download primary"></i>
-                </p>
-              </div>
-              <div className="center w-lg">
-                <p className="hover">{e[4]}</p>
-              </div>
-            </div>
-          </div>
-        </File>
-      ))
-    ) : (
-      <p>No files</p>
-    );
+            </File>
+          );
+        })
+      ) : (
+        <p>No files found</p>
+      );
+    } else {
+      return fileData.files.length > 0 ? (
+        fileData.files
+          .map((e, index) => {
+            const fileName = e[4];
+            let fileIcon;
+            if (fileName.includes("pdf")) {
+              fileIcon = "far fa-file-pdf fa-5x primary";
+            } else if (fileName.includes("png")) {
+              fileIcon = "far fa-image fa-5x file-icon primary";
+            } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
+              fileIcon = "fas fa-image fa-5x file-icon primary";
+            } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
+              fileIcon = "far fa-file-powerpoint fa-5x primary";
+            } else if (fileName.includes("doc" || fileName.includes("docx"))) {
+              fileIcon = "far fa-file-word fa-5x primary";
+            }
+            return (
+              <File key={index}>
+                <div className="file-content">
+                  <div className="part-top">
+                    <div>
+                      <i className={fileIcon}></i>
+                    </div>
+                  </div>
+                  <div className="part-bottom flex">
+                    <div className="ml-2 w-sm">
+                      <p>
+                        <i className="fas fa-download primary"></i>
+                      </p>
+                    </div>
+                    <div className="center w-lg">
+                      <p className="hover">{e[4]}</p>
+                    </div>
+                  </div>
+                </div>
+              </File>
+            );
+          })
+          .reverse()
+      ) : (
+        <p>No files</p>
+      );
+    }
+  };
+
+  const searchHandler = (e) => {
+    const fileName = e.target.value;
+    console.log(fileName);
+    const newFiles = fileData.files.filter((e) => e[4].includes(fileName));
+    if (fileName === "") {
+      setSearch({ searchActive: false, searchFiles: [] });
+    } else {
+      setSearch({ searchActive: true, searchFiles: newFiles });
+    }
+  };
+
+  const getDateString = (timestamp) => {
+    const date = new Date(parseInt(timestamp) * 1000);
+    return date.toDateString();
   };
 
   return (
@@ -314,7 +395,8 @@ const Dashboard = () => {
             <Align className="v-center">
               <div>
                 <div className="md display">
-                  <i className="fas fa-file md-v"></i> <p>16 files</p>
+                  <i className="fas fa-file md-v"></i>{" "}
+                  <p>{fileData.files.length} Files</p>
                 </div>
               </div>
             </Align>
@@ -322,13 +404,20 @@ const Dashboard = () => {
               <div>
                 <div className="md display">
                   <i className="fas fa-clock md-v"></i>
-                  <p>Last uploaded yesterday</p>
+                  <p>
+                    {fileData.files.length > 0
+                      ? "Last Uploaded " +
+                        getDateString(
+                          fileData.files[fileData.files.length - 1][5]
+                        )
+                      : "No files Uploaded"}
+                  </p>
                 </div>
               </div>
             </Align>
           </Holder>
           <Holder>
-            <ProgressBar readings={readings} />
+            <ProgressBar fileData={fileData} />
           </Holder>
         </TopBar>
         <SearchHolder>
@@ -343,14 +432,17 @@ const Dashboard = () => {
               </div>
             </div>
             <div>
-              <input type="text" className="search" placeholder="Search" />
+              <input
+                type="text"
+                className="search"
+                placeholder="Search"
+                onChange={searchHandler}
+              />
             </div>
           </div>
         </SearchHolder>
-
         <FileList>{Files()}</FileList>
       </Container>
-
       <Footer />
     </div>
   );
