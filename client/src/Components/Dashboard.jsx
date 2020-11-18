@@ -90,6 +90,15 @@ const Dashboard = () => {
     getData();
   }, [state.contract]);
 
+  const cancelUpload = () => {
+    console.log("cancel upload");
+    setstate({
+      ...state,
+      buffer: null,
+      name: null,
+      type: null,
+    });
+  };
   const getData = async () => {
     const { accounts, contract } = state;
     if (contract) {
@@ -101,7 +110,9 @@ const Dashboard = () => {
 
       for (var fileIndex = 0; fileIndex < filesCount; fileIndex++) {
         const FILE = await contract.methods.getFilesofUser(fileIndex).call();
-        files.push(FILE);
+        if (FILE[0] != "") {
+          files.push(FILE);
+        }
       }
 
       console.log("FILES IN GETDATA", files);
@@ -145,12 +156,13 @@ const Dashboard = () => {
       newAddedFile[3] = uploadedFileDetails.fileType;
       newAddedFile[5] = uploadedFileDetails.uploadTime;
 
+      const newFilesArray = [newAddedFile, ...fileData.files];
+      console.log(newFilesArray);
       setFiles({
         ...fileData,
-        files: [newAddedFile, ...fileData.files],
+        files: newFilesArray,
       });
 
-      console.log("FileData", fileData);
       // reset the component state of file upload
       setstate({
         ...state,
@@ -187,6 +199,23 @@ const Dashboard = () => {
       buffer,
       type,
       name,
+    });
+  };
+
+  const removeFile = async (fileId) => {
+    const { accounts, contract } = state;
+
+    const uploadedFile = await contract.methods
+      .removeHash(fileId)
+      .send({ from: accounts[0] });
+
+    console.log(uploadedFile);
+
+    const newFileList = fileData.files.filter((e) => e[0] != fileId);
+
+    setFiles({
+      ...fileData,
+      files: newFileList,
     });
   };
 
@@ -259,12 +288,23 @@ const Dashboard = () => {
                   </div>
                   <div className="part-bottom flex">
                     <div className="ml-2 w-sm">
-                      <p>
+                      <p
+                        onClick={() =>
+                          window.open(`https://gateway.ipfs.io/ipfs/${e[1]}`)
+                        }
+                      >
                         <i className="fas fa-download primary"></i>
                       </p>
                     </div>
                     <div className="center w-lg">
-                      <p className="hover">{e[4]}</p>
+                      <p className="hover">
+                        {e[4].length > 20 ? `${e[4].slice(0, 20)}...` : e[4]}
+                      </p>
+                    </div>
+                    <div className="ml-2 w-sm">
+                      <p onClick={() => removeFile(e[0])}>
+                        <i className="fas fa-trash primary"></i>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -273,7 +313,14 @@ const Dashboard = () => {
           })
           .reverse()
       ) : (
-        <p>No files</p>
+        <div className="center no-files">
+          <div>
+            <i class="far fa-folder-open light-primary"></i>
+          </div>
+          <div>
+            <p className="small-font">No files</p>
+          </div>
+        </div>
       );
     }
   };
@@ -327,6 +374,12 @@ const Dashboard = () => {
         type="file"
         onChange={handleOnChange}
       />
+
+      {state.buffer && state.loading === false ? (
+        <div className="cancel hover" onClick={cancelUpload}>
+          <i className="fas cancel-icon fa-window-close"></i> Cancel
+        </div>
+      ) : null}
 
       <FileUpload>
         {state.loading ? (
@@ -411,11 +464,6 @@ const Dashboard = () => {
             <Heading>Files</Heading>
           </div>
           <div className="flex ">
-            <div className="sort">
-              <div>
-                <i className="far fa-calendar-alt"></i>
-              </div>
-            </div>
             <div>
               <input
                 type="text"
