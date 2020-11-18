@@ -225,15 +225,15 @@ const Dashboard = () => {
         searchState.searchFiles.map((e, index) => {
           const fileName = e[4];
           let fileIcon;
-          if (fileName.includes("pdf")) {
+          if (fileName.endsWith("pdf")) {
             fileIcon = "far fa-file-pdf fa-5x primary";
-          } else if (fileName.includes("png")) {
+          } else if (fileName.endsWith("png")) {
             fileIcon = "far fa-image fa-5x file-icon primary";
-          } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
+          } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")) {
             fileIcon = "fas fa-image fa-5x file-icon primary";
-          } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
+          } else if (fileName.endsWith("ppt") || fileName.endsWith("pptx")) {
             fileIcon = "far fa-file-powerpoint fa-5x primary";
-          } else if (fileName.includes("doc" || fileName.includes("docx"))) {
+          } else if (fileName.endsWith("doc" || fileName.endsWith("docx"))) {
             fileIcon = "far fa-file-word fa-5x primary";
           }
           return (
@@ -267,15 +267,15 @@ const Dashboard = () => {
           .map((e, index) => {
             const fileName = e[4];
             let fileIcon;
-            if (fileName.includes("pdf")) {
+            if (fileName.endsWith("pdf")) {
               fileIcon = "far fa-file-pdf fa-5x primary";
-            } else if (fileName.includes("png")) {
+            } else if (fileName.endsWith("png")) {
               fileIcon = "far fa-image fa-5x file-icon primary";
-            } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
+            } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")) {
               fileIcon = "fas fa-image fa-5x file-icon primary";
-            } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
+            } else if (fileName.endsWith("ppt") || fileName.endsWith("pptx")) {
               fileIcon = "far fa-file-powerpoint fa-5x primary";
-            } else if (fileName.includes("doc" || fileName.includes("docx"))) {
+            } else if (fileName.endsWith("doc" || fileName.endsWith("docx"))) {
               fileIcon = "far fa-file-word fa-5x primary";
             }
             return (
@@ -326,7 +326,7 @@ const Dashboard = () => {
   };
 
   const searchHandler = (e) => {
-    const fileName = e.target.value;
+    const fileName = e.target.value.toLowerCase();
     console.log(fileName);
     const newFiles = fileData.files.filter((e) => e[4].includes(fileName));
     if (fileName === "") {

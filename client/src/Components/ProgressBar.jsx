@@ -34,15 +34,15 @@ const ProgressBar = (props) => {
   useEffect(() => {
     fileData.files.forEach((e, index) => {
       const fileName = e[4];
-      if (fileName.includes("pdf")) {
+      if (fileName.endsWith("pdf")) {
         fileTypeCount["pdf"] += 1;
-      } else if (fileName.includes("png")) {
+      } else if (fileName.endsWith("png")) {
         fileTypeCount["png"] += 1;
-      } else if (fileName.includes("jpg") || fileName.includes("jpeg")) {
+      } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")) {
         fileTypeCount["jpg"] += 1;
-      } else if (fileName.includes("ppt") || fileName.includes("pptx")) {
+      } else if (fileName.endsWith("ppt") || fileName.endsWith("pptx")) {
         fileTypeCount["ppt"] += 1;
-      } else if (fileName.includes("doc") || fileName.includes("docx")) {
+      } else if (fileName.endsWith("doc") || fileName.endsWith("docx")) {
         fileTypeCount["doc"] += 1;
       }
     });
