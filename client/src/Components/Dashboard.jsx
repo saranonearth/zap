@@ -154,12 +154,13 @@ const Dashboard = () => {
       newAddedFile[3] = uploadedFileDetails.fileType;
       newAddedFile[5] = uploadedFileDetails.uploadTime;
 
+      const newFilesArray = [newAddedFile, ...fileData.files];
+      console.log(newFilesArray);
       setFiles({
         ...fileData,
-        files: [newAddedFile, ...fileData.files],
+        files: newFilesArray,
       });
 
-      console.log("FileData", fileData);
       // reset the component state of file upload
       setstate({
         ...state,
@@ -268,7 +269,11 @@ const Dashboard = () => {
                   </div>
                   <div className="part-bottom flex">
                     <div className="ml-2 w-sm">
-                      <p>
+                      <p
+                        onClick={() =>
+                          window.open(`https://gateway.ipfs.io/ipfs/${e[1]}`)
+                        }
+                      >
                         <i className="fas fa-download primary"></i>
                       </p>
                     </div>
@@ -426,11 +431,6 @@ const Dashboard = () => {
             <Heading>Files</Heading>
           </div>
           <div className="flex ">
-            <div className="sort">
-              <div>
-                <i className="far fa-calendar-alt"></i>
-              </div>
-            </div>
             <div>
               <input
                 type="text"
