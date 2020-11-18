@@ -199,6 +199,19 @@ center {
     flex-direction: row;
 }
 
+.light-primary {
+    font-size: 10em;
+}
+
+.no-files {
+    width: 100%;
+    color: #c2aae9;
+}
+
+.small-font {
+    font-size: 1.5em !important;
+}
+
 .cancel {
     transition: 0.5s;
     background: linear-gradient( 90deg, rgba(77, 1, 180, 1) 0%, rgba(101, 1, 180, 1) 100%);

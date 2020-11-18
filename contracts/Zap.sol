@@ -72,5 +72,19 @@ contract Zap{
       return (file.fileId,file.fileHash,file.fileSize,file.fileType,file.fileName,file.uploadTime);
     
   }
+
+    function removeHash(string memory _fileId) public {
+      
+         File[] storage f = users[msg.sender];
+  
+         for (uint i = 0; i < f.length; i++) {
+             if (keccak256(abi.encodePacked(f[i].fileId)) == keccak256(abi.encodePacked(_fileId))) {
+              
+               delete users[msg.sender][i];
+                 
+             }
+             
+         }
+  }
     
 }

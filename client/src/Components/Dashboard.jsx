@@ -110,7 +110,9 @@ const Dashboard = () => {
 
       for (var fileIndex = 0; fileIndex < filesCount; fileIndex++) {
         const FILE = await contract.methods.getFilesofUser(fileIndex).call();
-        files.push(FILE);
+        if (FILE[0] != "") {
+          files.push(FILE);
+        }
       }
 
       console.log("FILES IN GETDATA", files);
@@ -200,6 +202,23 @@ const Dashboard = () => {
     });
   };
 
+  const removeFile = async (fileId) => {
+    const { accounts, contract } = state;
+
+    const uploadedFile = await contract.methods
+      .removeHash(fileId)
+      .send({ from: accounts[0] });
+
+    console.log(uploadedFile);
+
+    const newFileList = fileData.files.filter((e) => e[0] != fileId);
+
+    setFiles({
+      ...fileData,
+      files: newFileList,
+    });
+  };
+
   const Files = () => {
     if (searchState.searchActive) {
       return searchState.searchFiles.length > 0 ? (
@@ -278,7 +297,14 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <div className="center w-lg">
-                      <p className="hover">{e[4]}</p>
+                      <p className="hover">
+                        {e[4].length > 20 ? `${e[4].slice(0, 20)}...` : e[4]}
+                      </p>
+                    </div>
+                    <div className="ml-2 w-sm">
+                      <p onClick={() => removeFile(e[0])}>
+                        <i className="fas fa-trash primary"></i>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -287,7 +313,14 @@ const Dashboard = () => {
           })
           .reverse()
       ) : (
-        <p>No files</p>
+        <div className="center no-files">
+          <div>
+            <i class="far fa-folder-open light-primary"></i>
+          </div>
+          <div>
+            <p className="small-font">No files</p>
+          </div>
+        </div>
       );
     }
   };
