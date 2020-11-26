@@ -16,7 +16,7 @@ Zap is a decentralized file storage application built over ethereum blockchain a
     └── README.md
     
 
-![Untitled Diagram](https://user-images.githubusercontent.com/44068102/100355477-d8866700-3017-11eb-99d2-45db5db675f4.jpg)
+
 
 
 ### How to run localy?
