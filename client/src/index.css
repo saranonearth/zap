@@ -83,8 +83,22 @@ p3:#6200B4
     width: 10%;
 }
 
+.sticker {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #521aab;
+    color: white;
+    width: max-content;
+    height: 50px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+}
+
 .w-lg {
-    width: 60%;
+    width: 50%;
     font-weight: 600;
     color: #521aab;
 }

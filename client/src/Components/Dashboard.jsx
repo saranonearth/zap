@@ -33,18 +33,27 @@ const Dashboard = () => {
   const hiddenFileInput = useRef();
   const history = useHistory();
 
+  const [toAddress, setToAddress] = useState(
+    "0xa2E1C187974d64838aEe0661aE4C4961CeB316a5"
+  );
+
   const [state, setstate] = useState({
     accounts: null,
     web3: null,
     contract: null,
     buffer: null,
     type: null,
+    shareSuccess: "",
     name: null,
     ipfsError: null,
     loading: false,
   });
 
   const [fileData, setFiles] = useState({
+    files: [],
+  });
+
+  const [sharedFiles, setSharedFiles] = useState({
     files: [],
   });
 
@@ -110,7 +119,7 @@ const Dashboard = () => {
 
       for (var fileIndex = 0; fileIndex < filesCount; fileIndex++) {
         const FILE = await contract.methods.getFilesofUser(fileIndex).call();
-        if (FILE[0] != "") {
+        if (FILE[0] !== "") {
           files.push(FILE);
         }
       }
@@ -211,12 +220,85 @@ const Dashboard = () => {
 
     console.log(uploadedFile);
 
-    const newFileList = fileData.files.filter((e) => e[0] != fileId);
+    const newFileList = fileData.files.filter((e) => e[0] !== fileId);
 
     setFiles({
       ...fileData,
       files: newFileList,
     });
+  };
+
+  const shareFile = async (file) => {
+    const { accounts, contract } = state;
+
+    console.log("Share File");
+
+    setstate({
+      ...state,
+      loading: true,
+    });
+
+    try {
+      const FILE_ID = file[0];
+      const FILE_HASH = file[1];
+      const FILE_SIZE = file[2];
+
+      const uploadedFile = await contract.methods
+        .uploadShareFile(
+          toAddress,
+          FILE_ID,
+          FILE_HASH,
+          FILE_SIZE,
+          file[3],
+          file[4]
+        )
+        .send({ from: accounts[0] });
+      console.log(uploadedFile);
+      const uploadedFileDetails =
+        uploadedFile.events.FileShareUploaded.returnValues;
+
+      //Building file object to add to state
+      let newAddedFile = {};
+      newAddedFile[0] = uploadedFileDetails.fileId;
+      newAddedFile[1] = uploadedFileDetails.fileHash;
+      newAddedFile[4] = uploadedFileDetails.fileName;
+      newAddedFile[2] = uploadedFileDetails.fileSize;
+      newAddedFile[3] = uploadedFileDetails.fileType;
+      newAddedFile[5] = uploadedFileDetails.uploadTime;
+
+      const newFilesArray = [newAddedFile, ...fileData.files];
+      console.log(newFilesArray);
+      setSharedFiles({
+        ...fileData,
+        files: newFilesArray,
+      });
+
+      // reset the component state of file upload
+      setstate({
+        ...state,
+        buffer: null,
+        name: null,
+        type: null,
+        shareSuccess: "File shared.",
+        loading: false,
+      });
+
+      setTimeout(() => {
+        setstate({
+          ...state,
+          shareSuccess: "",
+        });
+      }, 2000);
+    } catch (error) {
+      setstate({
+        ...state,
+        shareSuccess: "Error occured.",
+        ipfsError: "Share Error",
+
+        loading: false,
+      });
+      console.log("Share Error", error);
+    }
   };
 
   const Files = () => {
@@ -298,7 +380,12 @@ const Dashboard = () => {
                     </div>
                     <div className="center w-lg">
                       <p className="hover">
-                        {e[4].length > 20 ? `${e[4].slice(0, 20)}...` : e[4]}
+                        {e[4].length > 15 ? `${e[4].slice(0, 15)}...` : e[4]}
+                      </p>
+                    </div>
+                    <div className="w-sm">
+                      <p onClick={() => shareFile(e)}>
+                        <i className="fas fa-share-alt primary"></i>
                       </p>
                     </div>
                     <div className="ml-2 w-sm">
@@ -315,7 +402,7 @@ const Dashboard = () => {
       ) : (
         <div className="center no-files">
           <div>
-            <i class="far fa-folder-open light-primary"></i>
+            <i className="far fa-folder-open light-primary"></i>
           </div>
           <div>
             <p className="small-font">No files</p>
@@ -343,6 +430,13 @@ const Dashboard = () => {
 
   return (
     <div>
+      {state.shareSuccess ? (
+        <div className="sticker v-center">
+          <div>
+            <p>{state.shareSuccess}</p>
+          </div>
+        </div>
+      ) : null}
       <Bar>
         <Flex>
           <div>
