@@ -328,12 +328,28 @@ const Dashboard = () => {
                 </div>
                 <div className="part-bottom flex">
                   <div className="ml-2 w-sm">
-                    <p>
+                    <p
+                      onClick={() =>
+                        window.open(`https://gateway.ipfs.io/ipfs/${e[1]}`)
+                      }
+                    >
                       <i className="fas fa-download primary"></i>
                     </p>
                   </div>
                   <div className="center w-lg">
-                    <p className="hover">{e[4]}</p>
+                    <p className="hover">
+                      {e[4].length > 15 ? `${e[4].slice(0, 15)}...` : e[4]}
+                    </p>
+                  </div>
+                  <div className="w-sm">
+                    <p onClick={() => shareFile(e)}>
+                      <i className="fas fa-share-alt primary"></i>
+                    </p>
+                  </div>
+                  <div className="ml-2 w-sm">
+                    <p onClick={() => removeFile(e[0])}>
+                      <i className="fas fa-trash primary"></i>
+                    </p>
                   </div>
                 </div>
               </div>
