@@ -34,7 +34,7 @@ const Dashboard = () => {
   const history = useHistory();
 
   const [toAddress, setToAddress] = useState(
-    "0xa2E1C187974d64838aEe0661aE4C4961CeB316a5"
+    "0xd5DFdEAdcE7052eFc612cAAd7d661A759f73267b"
   );
 
   const [state, setstate] = useState({
@@ -111,22 +111,43 @@ const Dashboard = () => {
   const getData = async () => {
     const { accounts, contract } = state;
     if (contract) {
-      const filesCount = await contract.methods.getCount().call();
-      console.log(generateUID());
-      console.log("FILECOUNT", filesCount);
+      const filesCount = await contract.methods
+        .getCount(window.ethereum.selectedAddress)
+        .call();
 
       let files = [];
+      let shareFiles = [];
 
       for (var fileIndex = 0; fileIndex < filesCount; fileIndex++) {
-        const FILE = await contract.methods.getFilesofUser(fileIndex).call();
+        const FILE = await contract.methods
+          .getFilesofUser(fileIndex, window.ethereum.selectedAddress)
+          .call();
         if (FILE[0] !== "") {
           files.push(FILE);
         }
       }
 
-      console.log("FILES IN GETDATA", files);
+      const filesShareCount = await contract.methods
+        .getShareCount(window.ethereum.selectedAddress)
+        .call();
 
+      for (var fileIndex = 0; fileIndex < filesShareCount; fileIndex++) {
+        const FILE = await contract.methods
+          .getShareFilesofUser(fileIndex, window.ethereum.selectedAddress)
+          .call();
+        if (FILE[0] !== "") {
+          shareFiles.push(FILE);
+        }
+      }
+
+      console.log("SHARED", shareFiles);
+
+      setSharedFiles({
+        ...shareFile,
+        files: shareFiles,
+      });
       setFiles({
+        ...fileData,
         files,
       });
     }
@@ -151,7 +172,14 @@ const Dashboard = () => {
       const FILE_SIZE = res.size;
 
       const uploadedFile = await contract.methods
-        .uploadFile(FILE_ID, FILE_HASH, FILE_SIZE, state.type, state.name)
+        .uploadFile(
+          window.ethereum.selectedAddress,
+          FILE_ID,
+          FILE_HASH,
+          FILE_SIZE,
+          state.type,
+          state.name
+        )
         .send({ from: accounts[0] });
 
       const uploadedFileDetails = uploadedFile.events.FileUploaded.returnValues;
@@ -211,21 +239,38 @@ const Dashboard = () => {
     });
   };
 
-  const removeFile = async (fileId) => {
+  const removeFile = async (fileId, type) => {
     const { accounts, contract } = state;
 
-    const uploadedFile = await contract.methods
-      .removeHash(fileId)
-      .send({ from: accounts[0] });
+    if (type === "file") {
+      const uploadedFile = await contract.methods
+        .removeHash(fileId, window.ethereum.selectedAddress)
+        .send({ from: accounts[0] });
 
-    console.log(uploadedFile);
+      console.log(uploadedFile);
 
-    const newFileList = fileData.files.filter((e) => e[0] !== fileId);
+      const newFileList = fileData.files.filter((e) => e[0] !== fileId);
 
-    setFiles({
-      ...fileData,
-      files: newFileList,
-    });
+      setFiles({
+        ...fileData,
+        files: newFileList,
+      });
+    }
+
+    if (type === "share") {
+      const uploadedFile = await contract.methods
+        .removeShareHash(fileId, window.ethereum.selectedAddress)
+        .send({ from: accounts[0] });
+
+      console.log(uploadedFile);
+
+      const newFileList = sharedFiles.files.filter((e) => e[0] !== fileId);
+
+      setSharedFiles({
+        ...sharedFiles,
+        files: newFileList,
+      });
+    }
   };
 
   const shareFile = async (file) => {
@@ -239,7 +284,7 @@ const Dashboard = () => {
     });
 
     try {
-      const FILE_ID = file[0];
+      const FILE_ID = generateUID();
       const FILE_HASH = file[1];
       const FILE_SIZE = file[2];
 
@@ -268,10 +313,6 @@ const Dashboard = () => {
 
       const newFilesArray = [newAddedFile, ...fileData.files];
       console.log(newFilesArray);
-      setSharedFiles({
-        ...fileData,
-        files: newFilesArray,
-      });
 
       // reset the component state of file upload
       setstate({
@@ -298,6 +339,12 @@ const Dashboard = () => {
         loading: false,
       });
       console.log("Share Error", error);
+      setTimeout(() => {
+        setstate({
+          ...state,
+          shareSuccess: "",
+        });
+      }, 2000);
     }
   };
 
@@ -347,7 +394,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="ml-2 w-sm">
-                    <p onClick={() => removeFile(e[0])}>
+                    <p onClick={() => removeFile(e[0], "file")}>
                       <i className="fas fa-trash primary"></i>
                     </p>
                   </div>
@@ -357,7 +404,14 @@ const Dashboard = () => {
           );
         })
       ) : (
-        <p>No files found</p>
+        <div className="center no-files">
+          <div>
+            <i className="far fa-folder-open light-primary"></i>
+          </div>
+          <div>
+            <p className="small-font">No files</p>
+          </div>
+        </div>
       );
     } else {
       return fileData.files.length > 0 ? (
@@ -405,7 +459,7 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <div className="ml-2 w-sm">
-                      <p onClick={() => removeFile(e[0])}>
+                      <p onClick={() => removeFile(e[0], "file")}>
                         <i className="fas fa-trash primary"></i>
                       </p>
                     </div>
@@ -427,7 +481,73 @@ const Dashboard = () => {
       );
     }
   };
-
+  const sharedFilestoUser = () => {
+    return sharedFiles.files.length > 0 ? (
+      sharedFiles.files
+        .map((e, index) => {
+          const fileName = e[4];
+          let fileIcon;
+          if (fileName.endsWith("pdf")) {
+            fileIcon = "far fa-file-pdf fa-5x primary";
+          } else if (fileName.endsWith("png")) {
+            fileIcon = "far fa-image fa-5x file-icon primary";
+          } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")) {
+            fileIcon = "fas fa-image fa-5x file-icon primary";
+          } else if (fileName.endsWith("ppt") || fileName.endsWith("pptx")) {
+            fileIcon = "far fa-file-powerpoint fa-5x primary";
+          } else if (fileName.endsWith("doc" || fileName.endsWith("docx"))) {
+            fileIcon = "far fa-file-word fa-5x primary";
+          }
+          return (
+            <File key={index}>
+              <div className="file-content">
+                <div className="part-top">
+                  <div>
+                    <i className={fileIcon}></i>
+                  </div>
+                </div>
+                <div className="part-bottom flex">
+                  <div className="ml-2 w-sm">
+                    <p
+                      onClick={() =>
+                        window.open(`https://gateway.ipfs.io/ipfs/${e[1]}`)
+                      }
+                    >
+                      <i className="fas fa-download primary"></i>
+                    </p>
+                  </div>
+                  <div className="center w-lg">
+                    <p className="hover">
+                      {e[4].length > 15 ? `${e[4].slice(0, 15)}...` : e[4]}
+                    </p>
+                  </div>
+                  <div className="w-sm">
+                    <p onClick={() => shareFile(e)}>
+                      <i className="fas fa-share-alt primary"></i>
+                    </p>
+                  </div>
+                  <div className="ml-2 w-sm">
+                    <p onClick={() => removeFile(e[0], "share")}>
+                      <i className="fas fa-trash primary"></i>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </File>
+          );
+        })
+        .reverse()
+    ) : (
+      <div className="center no-files">
+        <div>
+          <i className="far fa-folder-open light-primary"></i>
+        </div>
+        <div>
+          <p className="small-font">No files</p>
+        </div>
+      </div>
+    );
+  };
   const searchHandler = (e) => {
     const fileName = e.target.value.toLowerCase();
     console.log(fileName);
@@ -585,6 +705,14 @@ const Dashboard = () => {
           </div>
         </SearchHolder>
         <FileList>{Files()}</FileList>
+        <SearchHolder>
+          <div>
+            {" "}
+            <Heading>Shared files</Heading>
+          </div>
+          <div className="flex "></div>
+        </SearchHolder>
+        <FileList>{sharedFilestoUser()}</FileList>
       </Container>
       <Footer />
     </div>
