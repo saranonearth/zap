@@ -97,13 +97,74 @@ p3:#6200B4
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
 }
 
+.j-center {
+    justify-content: center;
+}
+
+.a-input {
+    width: 100%;
+    height: 20px;
+    border: 2px solid #521aab;
+    height: 40px;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.head-con {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #521aab;
+}
+
+.s-btn {
+    background-color: #521aab;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.s-btn:hover {
+    cursor: pointer;
+}
+
+.c-btn {
+    border: 1px solid #c2aae9;
+    color: #c2aae9;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.c-btn:hover {
+    cursor: pointer;
+}
+
+.share-to {
+    background-color: white;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    height: 200px;
+    width: 400px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+}
+
+.share-form {
+    text-align: center;
+    width: 100%;
+}
+
 .w-lg {
     width: 50%;
     font-weight: 600;
     color: #521aab;
 }
 
-center {
+.center {
     text-align: center;
 }
 

@@ -33,10 +33,6 @@ const Dashboard = () => {
   const hiddenFileInput = useRef();
   const history = useHistory();
 
-  const [toAddress, setToAddress] = useState(
-    "0xd5DFdEAdcE7052eFc612cAAd7d661A759f73267b"
-  );
-
   const [state, setstate] = useState({
     accounts: null,
     web3: null,
@@ -56,7 +52,11 @@ const Dashboard = () => {
   const [sharedFiles, setSharedFiles] = useState({
     files: [],
   });
-
+  const [showShareModal, setShareModal] = useState({
+    show: false,
+    address: "",
+    file: null,
+  });
   const [searchState, setSearch] = useState({
     searchActive: false,
     searchFiles: [],
@@ -273,7 +273,7 @@ const Dashboard = () => {
     }
   };
 
-  const shareFile = async (file) => {
+  const shareFile = async (file, to_address) => {
     const { accounts, contract } = state;
 
     console.log("Share File");
@@ -290,7 +290,7 @@ const Dashboard = () => {
 
       const uploadedFile = await contract.methods
         .uploadShareFile(
-          toAddress,
+          to_address,
           FILE_ID,
           FILE_HASH,
           FILE_SIZE,
@@ -389,7 +389,15 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="w-sm">
-                    <p onClick={() => shareFile(e)}>
+                    <p
+                      onClick={() =>
+                        setShareModal({
+                          ...showShareModal,
+                          file: e,
+                          show: true,
+                        })
+                      }
+                    >
                       <i className="fas fa-share-alt primary"></i>
                     </p>
                   </div>
@@ -454,7 +462,15 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <div className="w-sm">
-                      <p onClick={() => shareFile(e)}>
+                      <p
+                        onClick={() =>
+                          setShareModal({
+                            ...showShareModal,
+                            file: e,
+                            show: true,
+                          })
+                        }
+                      >
                         <i className="fas fa-share-alt primary"></i>
                       </p>
                     </div>
@@ -522,7 +538,15 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="w-sm">
-                    <p onClick={() => shareFile(e)}>
+                    <p
+                      onClick={() =>
+                        setShareModal({
+                          ...showShareModal,
+                          file: e,
+                          show: true,
+                        })
+                      }
+                    >
                       <i className="fas fa-share-alt primary"></i>
                     </p>
                   </div>
@@ -566,6 +590,57 @@ const Dashboard = () => {
 
   return (
     <div>
+      {showShareModal.show && (
+        <div className="share-to v-center">
+          <div className="share-form">
+            <div className="head-con">Share to</div>
+            <div>
+              <input
+                onChange={(e) => {
+                  setShareModal({
+                    ...showShareModal,
+                    address: e.target.value,
+                  });
+                }}
+                className="a-input"
+                type="text"
+                placeholder="Wallet address"
+                name="address"
+              />
+            </div>
+            <div>
+              <div className="j-center flex">
+                <div
+                  onClick={() => {
+                    shareFile(showShareModal.file, showShareModal.address);
+
+                    setShareModal({
+                      ...showShareModal,
+                      show: false,
+                      file: null,
+                      address: "",
+                    });
+                  }}
+                  className="s-btn"
+                >
+                  Share
+                </div>
+                <div
+                  onClick={() => {
+                    setShareModal({
+                      ...showShareModal,
+                      show: false,
+                    });
+                  }}
+                  className="c-btn"
+                >
+                  Cancel
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {state.shareSuccess ? (
         <div className="sticker v-center">
           <div>
