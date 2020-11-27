@@ -39,6 +39,7 @@ const Dashboard = () => {
     contract: null,
     buffer: null,
     type: null,
+    shareSuccess: "",
     name: null,
     ipfsError: null,
     loading: false,
@@ -48,6 +49,14 @@ const Dashboard = () => {
     files: [],
   });
 
+  const [sharedFiles, setSharedFiles] = useState({
+    files: [],
+  });
+  const [showShareModal, setShareModal] = useState({
+    show: false,
+    address: "",
+    file: null,
+  });
   const [searchState, setSearch] = useState({
     searchActive: false,
     searchFiles: [],
@@ -102,22 +111,43 @@ const Dashboard = () => {
   const getData = async () => {
     const { accounts, contract } = state;
     if (contract) {
-      const filesCount = await contract.methods.getCount().call();
-      console.log(generateUID());
-      console.log("FILECOUNT", filesCount);
+      const filesCount = await contract.methods
+        .getCount(window.ethereum.selectedAddress)
+        .call();
 
       let files = [];
+      let shareFiles = [];
 
       for (var fileIndex = 0; fileIndex < filesCount; fileIndex++) {
-        const FILE = await contract.methods.getFilesofUser(fileIndex).call();
-        if (FILE[0] != "") {
+        const FILE = await contract.methods
+          .getFilesofUser(fileIndex, window.ethereum.selectedAddress)
+          .call();
+        if (FILE[0] !== "") {
           files.push(FILE);
         }
       }
 
-      console.log("FILES IN GETDATA", files);
+      const filesShareCount = await contract.methods
+        .getShareCount(window.ethereum.selectedAddress)
+        .call();
 
+      for (var fileIndex = 0; fileIndex < filesShareCount; fileIndex++) {
+        const FILE = await contract.methods
+          .getShareFilesofUser(fileIndex, window.ethereum.selectedAddress)
+          .call();
+        if (FILE[0] !== "") {
+          shareFiles.push(FILE);
+        }
+      }
+
+      console.log("SHARED", shareFiles);
+
+      setSharedFiles({
+        ...shareFile,
+        files: shareFiles,
+      });
       setFiles({
+        ...fileData,
         files,
       });
     }
@@ -142,7 +172,14 @@ const Dashboard = () => {
       const FILE_SIZE = res.size;
 
       const uploadedFile = await contract.methods
-        .uploadFile(FILE_ID, FILE_HASH, FILE_SIZE, state.type, state.name)
+        .uploadFile(
+          window.ethereum.selectedAddress,
+          FILE_ID,
+          FILE_HASH,
+          FILE_SIZE,
+          state.type,
+          state.name
+        )
         .send({ from: accounts[0] });
 
       const uploadedFileDetails = uploadedFile.events.FileUploaded.returnValues;
@@ -202,21 +239,113 @@ const Dashboard = () => {
     });
   };
 
-  const removeFile = async (fileId) => {
+  const removeFile = async (fileId, type) => {
     const { accounts, contract } = state;
 
-    const uploadedFile = await contract.methods
-      .removeHash(fileId)
-      .send({ from: accounts[0] });
+    if (type === "file") {
+      const uploadedFile = await contract.methods
+        .removeHash(fileId, window.ethereum.selectedAddress)
+        .send({ from: accounts[0] });
 
-    console.log(uploadedFile);
+      console.log(uploadedFile);
 
-    const newFileList = fileData.files.filter((e) => e[0] != fileId);
+      const newFileList = fileData.files.filter((e) => e[0] !== fileId);
 
-    setFiles({
-      ...fileData,
-      files: newFileList,
+      setFiles({
+        ...fileData,
+        files: newFileList,
+      });
+    }
+
+    if (type === "share") {
+      const uploadedFile = await contract.methods
+        .removeShareHash(fileId, window.ethereum.selectedAddress)
+        .send({ from: accounts[0] });
+
+      console.log(uploadedFile);
+
+      const newFileList = sharedFiles.files.filter((e) => e[0] !== fileId);
+
+      setSharedFiles({
+        ...sharedFiles,
+        files: newFileList,
+      });
+    }
+  };
+
+  const shareFile = async (file, to_address) => {
+    const { accounts, contract } = state;
+
+    console.log("Share File");
+
+    setstate({
+      ...state,
+      loading: true,
     });
+
+    try {
+      const FILE_ID = generateUID();
+      const FILE_HASH = file[1];
+      const FILE_SIZE = file[2];
+
+      const uploadedFile = await contract.methods
+        .uploadShareFile(
+          to_address,
+          FILE_ID,
+          FILE_HASH,
+          FILE_SIZE,
+          file[3],
+          file[4]
+        )
+        .send({ from: accounts[0] });
+      console.log(uploadedFile);
+      const uploadedFileDetails =
+        uploadedFile.events.FileShareUploaded.returnValues;
+
+      //Building file object to add to state
+      let newAddedFile = {};
+      newAddedFile[0] = uploadedFileDetails.fileId;
+      newAddedFile[1] = uploadedFileDetails.fileHash;
+      newAddedFile[4] = uploadedFileDetails.fileName;
+      newAddedFile[2] = uploadedFileDetails.fileSize;
+      newAddedFile[3] = uploadedFileDetails.fileType;
+      newAddedFile[5] = uploadedFileDetails.uploadTime;
+
+      const newFilesArray = [newAddedFile, ...fileData.files];
+      console.log(newFilesArray);
+
+      // reset the component state of file upload
+      setstate({
+        ...state,
+        buffer: null,
+        name: null,
+        type: null,
+        shareSuccess: "File shared.",
+        loading: false,
+      });
+
+      setTimeout(() => {
+        setstate({
+          ...state,
+          shareSuccess: "",
+        });
+      }, 2000);
+    } catch (error) {
+      setstate({
+        ...state,
+        shareSuccess: "Error occured.",
+        ipfsError: "Share Error",
+
+        loading: false,
+      });
+      console.log("Share Error", error);
+      setTimeout(() => {
+        setstate({
+          ...state,
+          shareSuccess: "",
+        });
+      }, 2000);
+    }
   };
 
   const Files = () => {
@@ -246,12 +375,36 @@ const Dashboard = () => {
                 </div>
                 <div className="part-bottom flex">
                   <div className="ml-2 w-sm">
-                    <p>
+                    <p
+                      onClick={() =>
+                        window.open(`https://gateway.ipfs.io/ipfs/${e[1]}`)
+                      }
+                    >
                       <i className="fas fa-download primary"></i>
                     </p>
                   </div>
                   <div className="center w-lg">
-                    <p className="hover">{e[4]}</p>
+                    <p className="hover">
+                      {e[4].length > 15 ? `${e[4].slice(0, 15)}...` : e[4]}
+                    </p>
+                  </div>
+                  <div className="w-sm">
+                    <p
+                      onClick={() =>
+                        setShareModal({
+                          ...showShareModal,
+                          file: e,
+                          show: true,
+                        })
+                      }
+                    >
+                      <i className="fas fa-share-alt primary"></i>
+                    </p>
+                  </div>
+                  <div className="ml-2 w-sm">
+                    <p onClick={() => removeFile(e[0], "file")}>
+                      <i className="fas fa-trash primary"></i>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -259,7 +412,14 @@ const Dashboard = () => {
           );
         })
       ) : (
-        <p>No files found</p>
+        <div className="center no-files">
+          <div>
+            <i className="far fa-folder-open light-primary"></i>
+          </div>
+          <div>
+            <p className="small-font">No files</p>
+          </div>
+        </div>
       );
     } else {
       return fileData.files.length > 0 ? (
@@ -298,11 +458,24 @@ const Dashboard = () => {
                     </div>
                     <div className="center w-lg">
                       <p className="hover">
-                        {e[4].length > 20 ? `${e[4].slice(0, 20)}...` : e[4]}
+                        {e[4].length > 15 ? `${e[4].slice(0, 15)}...` : e[4]}
+                      </p>
+                    </div>
+                    <div className="w-sm">
+                      <p
+                        onClick={() =>
+                          setShareModal({
+                            ...showShareModal,
+                            file: e,
+                            show: true,
+                          })
+                        }
+                      >
+                        <i className="fas fa-share-alt primary"></i>
                       </p>
                     </div>
                     <div className="ml-2 w-sm">
-                      <p onClick={() => removeFile(e[0])}>
+                      <p onClick={() => removeFile(e[0], "file")}>
                         <i className="fas fa-trash primary"></i>
                       </p>
                     </div>
@@ -315,7 +488,7 @@ const Dashboard = () => {
       ) : (
         <div className="center no-files">
           <div>
-            <i class="far fa-folder-open light-primary"></i>
+            <i className="far fa-folder-open light-primary"></i>
           </div>
           <div>
             <p className="small-font">No files</p>
@@ -324,7 +497,81 @@ const Dashboard = () => {
       );
     }
   };
-
+  const sharedFilestoUser = () => {
+    return sharedFiles.files.length > 0 ? (
+      sharedFiles.files
+        .map((e, index) => {
+          const fileName = e[4];
+          let fileIcon;
+          if (fileName.endsWith("pdf")) {
+            fileIcon = "far fa-file-pdf fa-5x primary";
+          } else if (fileName.endsWith("png")) {
+            fileIcon = "far fa-image fa-5x file-icon primary";
+          } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")) {
+            fileIcon = "fas fa-image fa-5x file-icon primary";
+          } else if (fileName.endsWith("ppt") || fileName.endsWith("pptx")) {
+            fileIcon = "far fa-file-powerpoint fa-5x primary";
+          } else if (fileName.endsWith("doc" || fileName.endsWith("docx"))) {
+            fileIcon = "far fa-file-word fa-5x primary";
+          }
+          return (
+            <File key={index}>
+              <div className="file-content">
+                <div className="part-top">
+                  <div>
+                    <i className={fileIcon}></i>
+                  </div>
+                </div>
+                <div className="part-bottom flex">
+                  <div className="ml-2 w-sm">
+                    <p
+                      onClick={() =>
+                        window.open(`https://gateway.ipfs.io/ipfs/${e[1]}`)
+                      }
+                    >
+                      <i className="fas fa-download primary"></i>
+                    </p>
+                  </div>
+                  <div className="center w-lg">
+                    <p className="hover">
+                      {e[4].length > 15 ? `${e[4].slice(0, 15)}...` : e[4]}
+                    </p>
+                  </div>
+                  <div className="w-sm">
+                    <p
+                      onClick={() =>
+                        setShareModal({
+                          ...showShareModal,
+                          file: e,
+                          show: true,
+                        })
+                      }
+                    >
+                      <i className="fas fa-share-alt primary"></i>
+                    </p>
+                  </div>
+                  <div className="ml-2 w-sm">
+                    <p onClick={() => removeFile(e[0], "share")}>
+                      <i className="fas fa-trash primary"></i>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </File>
+          );
+        })
+        .reverse()
+    ) : (
+      <div className="center no-files">
+        <div>
+          <i className="far fa-folder-open light-primary"></i>
+        </div>
+        <div>
+          <p className="small-font">No files</p>
+        </div>
+      </div>
+    );
+  };
   const searchHandler = (e) => {
     const fileName = e.target.value.toLowerCase();
     console.log(fileName);
@@ -343,6 +590,64 @@ const Dashboard = () => {
 
   return (
     <div>
+      {showShareModal.show && (
+        <div className="share-to v-center">
+          <div className="share-form">
+            <div className="head-con">Share to</div>
+            <div>
+              <input
+                onChange={(e) => {
+                  setShareModal({
+                    ...showShareModal,
+                    address: e.target.value,
+                  });
+                }}
+                className="a-input"
+                type="text"
+                placeholder="Wallet address"
+                name="address"
+              />
+            </div>
+            <div>
+              <div className="j-center flex">
+                <div
+                  onClick={() => {
+                    shareFile(showShareModal.file, showShareModal.address);
+
+                    setShareModal({
+                      ...showShareModal,
+                      show: false,
+                      file: null,
+                      address: "",
+                    });
+                  }}
+                  className="s-btn"
+                >
+                  Share
+                </div>
+                <div
+                  onClick={() => {
+                    setShareModal({
+                      ...showShareModal,
+                      show: false,
+                    });
+                  }}
+                  className="c-btn"
+                >
+                  Cancel
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {state.shareSuccess ? (
+        <div className="sticker v-center">
+          <div>
+            <p>{state.shareSuccess}</p>
+          </div>
+        </div>
+      ) : null}
       <Bar>
         <Flex>
           <div>
@@ -475,6 +780,14 @@ const Dashboard = () => {
           </div>
         </SearchHolder>
         <FileList>{Files()}</FileList>
+        <SearchHolder>
+          <div>
+            {" "}
+            <Heading>Shared files</Heading>
+          </div>
+          <div className="flex "></div>
+        </SearchHolder>
+        <FileList>{sharedFilestoUser()}</FileList>
       </Container>
       <Footer />
     </div>
